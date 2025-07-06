@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Well-Tegra Data Solutions: Interactive Platform Tour</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        #walkthrough-container {
+            background-color: #030712;
+            border-radius: 1rem;
+            box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+            overflow: hidden;
+            border: 1px solid #1f2937;
+        }
+        .commentary-box {
+            background: rgba(17, 24, 39, 0.8);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid #374151;
+        }
+        .progress-bar-fill {
+            transition: width 0.5s ease-in-out;
+        }
+        .clickable {
+            cursor: pointer;
+            border: 2px dashed rgba(52, 211, 153, 0);
+            transition: all 0.3s ease;
+            border-radius: 0.5rem;
+        }
+        .clickable.highlight {
+            border-color: rgba(52, 211, 153, 0.7);
+            animation: pulse-green 2s infinite;
+        }
+        @keyframes pulse-green {
+            0% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(52, 211, 153, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); }
+        }
+        .btn-primary {
+            background: linear-gradient(to right, #0d9488, #059669);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            box-shadow: 0 10px 15px -3px rgb(5 150 105 / 0.3), 0 4px 6px -4px rgb(5 150 105 / 0.3);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen p-4 md:p-8">
+
+    <div class="text-center mb-8">
+        <img id="logo" src="" alt="Well-Tegra Logo" class="h-16 mx-auto mb-2">
+        <h1 class="text-4xl font-bold text-gray-800">Experience the Integrated Workflow</h1>
+        <p class="text-lg text-gray-600 mt-2">See how Well-Tegra transforms well operations from planning to analysis.</p>
+    </div>
+
+    <div id="walkthrough-container" class="w-full max-w-6xl aspect-[16/9] flex flex-col">
+        <div id="screen-content" class="flex-1 bg-cover bg-center transition-opacity duration-500">
+            <!-- Content will be injected by JS -->
+        </div>
+        <div class="commentary-box text-white p-6">
+            <h3 id="commentary-title" class="text-xl font-bold text-emerald-400"></h3>
+            <p id="commentary-subtitle" class="mt-1 text-gray-300"></p>
+            <div class="flex items-center justify-between mt-4">
+                <div class="w-full bg-gray-700 rounded-full h-2.5">
+                    <div id="progress-bar" class="bg-emerald-500 h-2.5 rounded-full progress-bar-fill" style="width: 0%"></div>
+                </div>
+                <div id="controls" class="ml-4 flex items-center space-x-2">
+                    <button id="run-pause-btn" class="text-white hover:text-emerald-400 transition">
+                        <svg id="pause-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        <svg id="play-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    </button>
+                    <button id="next-btn" class="text-white hover:text-emerald-400 transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 9l4 4m0 0l-4 4m4-4H3" /></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="mt-8 text-center">
+        <a href="#" class="btn-primary text-white font-bold py-3 px-6 rounded-lg">Request a Personalized Demo</a>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // --- BRANDING ---
+        const createLogo = (text, color1, color2) => {
+            const svg = `<svg width="200" height="50" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:${color1};stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:${color2};stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                <text x="50%" y="50%" dominant-baseline="central" text-anchor="middle" font-family="Inter, sans-serif" font-size="24" font-weight="bold" fill="url(#grad1)">Well-Tegra</text>
+            </svg>`;
+            return `data:image/svg+xml;base64,${btoa(svg)}`;
+        };
+        document.getElementById('logo').src = createLogo('#1e3a8a', '#0d9488');
+
+        // --- WALKTHROUGH DATA ---
+        const steps = [
+            {
+                id: 'planner-start',
+                title: 'Start with a Single Source of Truth.',
+                subtitle: 'The Planner connects directly to your systems of record, eliminating data silos and outdated spreadsheets. Click the underperforming well to begin.',
+                imageUrl: 'https://placehold.co/1920x1080/f9fafb/111827?text=Well+Portfolio+View',
+                clickableElement: '#well-card-1',
+                nextStep: 'planner-objective'
+            },
+            {
+                id: 'planner-objective',
+                title: 'Define Clear, Data-Driven Objectives.',
+                subtitle: 'With the well context established, select the primary objective for the intervention. The platform presents relevant options based on the well\'s status.',
+                imageUrl: 'https://placehold.co/1920x1080/f9fafb/111827?text=Objective+Selection',
+                clickableElement: '#objective-card-1',
+                nextStep: 'planner-plan'
+            },
+            {
+                id: 'planner-plan',
+                title: 'Generate an Optimized, Risk-Assessed Plan.',
+                subtitle: 'Well-Tegra automatically generates a baseline procedure, tooling list, and risk assessment. Click to generate the plan.',
+                imageUrl: 'https://placehold.co/1920x1080/f9fafb/111827?text=Plan+Generation',
+                clickableElement: '#generate-plan-btn',
+                nextStep: 'performer-live'
+            },
+            {
+                id: 'performer-live',
+                title: 'Bridge the Office-to-Wellsite Gap.',
+                subtitle: 'The static plan becomes a live, dynamic dashboard. Everyone, from the office to the rig, sees the same real-time data and work instructions.',
+                imageUrl: 'https://placehold.co/1920x1080/030712/f9fafb?text=Live+Performer+Dashboard',
+                clickableElement: null, // Auto-advances
+                nextStep: 'performer-alarm'
+            },
+            {
+                id: 'performer-alarm',
+                title: 'Manage by Exception.',
+                subtitle: 'The system automatically flags deviations from the plan, allowing your team to focus on what matters. An alarm has been triggered.',
+                imageUrl: 'https://placehold.co/1920x1080/030712/f9fafb?text=ALARM+DETECTED',
+                clickableElement: null, // Auto-advances
+                nextStep: 'analyzer-kpis'
+            },
+            {
+                id: 'analyzer-kpis',
+                title: 'Close the Loop with Automated Analysis.',
+                subtitle: 'As soon as the job is complete, the Analyzer provides an automated performance review, comparing plan vs. actuals instantly.',
+                imageUrl: 'https://placehold.co/1920x1080/f9fafb/111827?text=Automated+KPI+Dashboard',
+                clickableElement: null, // Auto-advances
+                nextStep: 'analyzer-lessons'
+            },
+            {
+                id: 'analyzer-lessons',
+                title: 'Capture and Re-use Lessons Learned.',
+                subtitle: 'Our AI analyzes the operation and NPT events to suggest actionable lessons, ensuring continuous improvement for future jobs. Click to see the suggestions.',
+                imageUrl: 'https://placehold.co/1920x1080/f9fafb/111827?text=Lessons+Learned+Module',
+                clickableElement: '#suggest-lessons-btn',
+                nextStep: 'end'
+            },
+            {
+                id: 'end',
+                title: 'This is the Future of Well Operations.',
+                subtitle: 'Integrated, data-driven, and intelligent. Ready to transform your performance?',
+                imageUrl: 'https://placehold.co/1920x1080/f9fafb/1e3a8a?text=Request+Your+Demo',
+                clickableElement: null,
+                nextStep: 'planner-start' // Loop back
+            }
+        ];
+
+        // --- STATE MANAGEMENT ---
+        let currentStepIndex = 0;
+        let isAutoRunning = true;
+        let autoRunInterval = null;
+
+        // --- DOM ELEMENTS ---
+        const screenContent = document.getElementById('screen-content');
+        const commentaryTitle = document.getElementById('commentary-title');
+        const commentarySubtitle = document.getElementById('commentary-subtitle');
+        const progressBar = document.getElementById('progress-bar');
+        const runPauseBtn = document.getElementById('run-pause-btn');
+        const playIcon = document.getElementById('play-icon');
+        const pauseIcon = document.getElementById('pause-icon');
+        const nextBtn = document.getElementById('next-btn');
+
+        // --- FUNCTIONS ---
+        function renderStep(stepIndex) {
+            const step = steps[stepIndex];
+            
+            // Update screen content based on step
+            screenContent.style.backgroundImage = `url('${step.imageUrl}')`;
+            screenContent.style.opacity = 0;
+            setTimeout(() => { screenContent.style.opacity = 1; }, 100);
+
+            // Inject mock UI for interaction
+            injectMockUI(step.id);
+
+            // Update commentary
+            commentaryTitle.textContent = step.title;
+            commentarySubtitle.textContent = step.subtitle;
+
+            // Update progress bar
+            const progressPercentage = (stepIndex / (steps.length - 1)) * 100;
+            progressBar.style.width = `${progressPercentage}%`;
+
+            // Highlight clickable element
+            document.querySelectorAll('.clickable').forEach(el => el.classList.remove('highlight'));
+            if (step.clickableElement) {
+                const el = document.querySelector(step.clickableElement);
+                if (el) {
+                    el.classList.add('highlight');
+                    // Stop autorun if there's something to click
+                    if(isAutoRunning) pauseAutoRun();
+                }
+            } else {
+                // If no clickable element, continue autorun
+                if(isAutoRunning) {
+                    pauseAutoRun(); // Clear previous timer
+                    startAutoRun(4000); // Start new timer
+                }
+            }
+        }
+        
+        function injectMockUI(stepId) {
+            let html = '';
+            switch(stepId) {
+                case 'planner-start':
+                    html = `<div class="p-8 grid grid-cols-3 gap-8">
+                                <div id="well-card-1" class="bg-white/10 backdrop-blur-sm p-6 rounded-lg border border-red-500 clickable">
+                                    <h4 class="font-bold text-white">Gullfaks C-34</h4><p class="text-red-400">Underperforming</p>
+                                </div>
+                                <div class="bg-white/10 backdrop-blur-sm p-6 rounded-lg border border-gray-600"><h4 class="font-bold text-white">Statfjord A-12</h4><p class="text-gray-400">Active</p></div>
+                                <div class="bg-white/10 backdrop-blur-sm p-6 rounded-lg border border-gray-600"><h4 class="font-bold text-white">Oseberg B-21</h4><p class="text-gray-400">Active</p></div>
+                            </div>`;
+                    break;
+                case 'planner-objective':
+                    html = `<div class="p-8 max-w-md mx-auto space-y-4">
+                                <div id="objective-card-1" class="bg-white/10 backdrop-blur-sm p-6 rounded-lg clickable">
+                                    <h4 class="font-bold text-white">Production Enhancement</h4><p class="text-gray-300">Increase hydrocarbon flow rate.</p>
+                                </div>
+                                <div class="bg-white/10 backdrop-blur-sm p-6 rounded-lg"><h4 class="font-bold text-white">Well Integrity</h4><p class="text-gray-300">Repair downhole components.</p></div>
+                            </div>`;
+                    break;
+                case 'planner-plan':
+                     html = `<div class="p-8 text-center">
+                                <button id="generate-plan-btn" class="btn-primary text-white font-bold py-4 px-8 rounded-lg text-xl clickable">Generate Integrated Plan</button>
+                             </div>`;
+                    break;
+                case 'performer-alarm':
+                    screenContent.classList.add('animate-pulse');
+                    break;
+                case 'analyzer-lessons':
+                    html = `<div class="p-8 text-center">
+                                <button id="suggest-lessons-btn" class="bg-purple-600 text-white font-bold py-4 px-8 rounded-lg text-xl clickable">✨ Suggest Lessons Learned</button>
+                             </div>`;
+                    break;
+                default:
+                    screenContent.classList.remove('animate-pulse');
+            }
+            screenContent.innerHTML = html;
+        }
+
+        function advanceStep() {
+            currentStepIndex = (currentStepIndex + 1) % steps.length;
+            renderStep(currentStepIndex);
+        }
+        
+        function startAutoRun(delay = 5000) {
+            if (autoRunInterval) clearInterval(autoRunInterval);
+            autoRunInterval = setInterval(advanceStep, delay);
+            isAutoRunning = true;
+            playIcon.classList.add('hidden');
+            pauseIcon.classList.remove('hidden');
+        }
+
+        function pauseAutoRun() {
+            clearInterval(autoRunInterval);
+            autoRunInterval = null;
+            isAutoRunning = false;
+            playIcon.classList.remove('hidden');
+            pauseIcon.classList.add('hidden');
+        }
+
+        // --- EVENT LISTENERS ---
+        runPauseBtn.addEventListener('click', () => {
+            if (isAutoRunning) {
+                pauseAutoRun();
+            } else {
+                startAutoRun();
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            pauseAutoRun();
+            advanceStep();
+        });
+
+        screenContent.addEventListener('click', (e) => {
+            const currentStep = steps[currentStepIndex];
+            if (currentStep.clickableElement && e.target.closest(currentStep.clickableElement)) {
+                pauseAutoRun();
+                advanceStep();
+            }
+        });
+
+        // --- INITIALIZATION ---
+        renderStep(currentStepIndex);
+        startAutoRun();
+    });
+    </script>
+</body>
+</html>
