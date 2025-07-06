@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>'
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device--width, initial-scale=1.0" />
+  <title>Well-Tegra Data Solutions: Integrated Operations Platform</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      transition: background-color 0.5s;
+    }
+    .planner-view,
+    .analyzer-view {
+      background-color: #f9fafb;
+      color: #111827;
+    }
+    .performer-view {
+      background-color: #030712;
+      color: #f9fafb;
+    }
+
+    /* General & Planner Styles */
+    .light-card {
+      background-color: white;
+      border-radius: 0.75rem;
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05),
+        0 2px 4px -2px rgb(0 0 0 / 0.05);
+      border: 1px solid #e5e7eb;
+    }
+    .planner-card {
+      transition: all 0.2s ease-in-out;
+      border: 2px solid transparent;
+    }
+    .planner-card.selected {
+      border-color: #0d9488;
+      transform: translateY(-5px);
+      box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1),
+        0 4px 6px -4px rgb(0 0 0 / 0.1);
+    }
+    .step-indicator {
+      transition: all 0.3s;
+    }
+    .step-indicator.active {
+      background-color: #0d9488;
+      color: white;
+    }
+    .step-indicator.completed {
+      background-color: #047857;
+      color: white;
+    }
+    .objective-label {
+      cursor: pointer;
+      border: 1px solid #e2e8f0;
+      transition: border-color 0.3s, background-color 0.3s;
+    }
+    .objective-label:hover {
+      border-color: #99f6e4;
+    }
+    input[type='radio']:checked + .objective-label {
+      border-color: #0d9488;
+      background-color: #f0fdfa;
+    }
+    .risk-low {
+      background-color: #dcfce7;
+      color: #166534;
+    }
+    .risk-medium {
+      background-color: #fef9c3;
+      color: #854d0e;
+    }
+    .risk-high {
+      background-color: #fee2e2;
+      color: #991b1b;
+    }
+
+    /* Performer Styles */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 3fr 6fr 3fr;
+      gap: 1.5rem;
+      height: calc(100vh - 80px);
+    }
+    .kpi-card {
+      background-color: #1f2937;
+      border-radius: 0.5rem;
+      border: 1px solid #374151;
+    }
+    .procedure-step {
+      border-left: 4px solid #4b5563;
+      transition: all 0.3s;
+    }
+    .procedure-step.active {
+      background-color: rgba(16, 185, 129, 0.1);
+      border-left-color: #10b981;
+    }
+    .procedure-step.completed {
+      border-left-color: #4b5563;
+      opacity: 0.6;
+    }
+    .log-entry {
+      border-bottom: 1px solid #374151;
+    }
+    .alarm {
+      animation: pulse 1.5s infinite;
+      box-shadow: 0 0 0 0 rgba(239, 68, 68, 1);
+    }
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+      }
+      70% {
+        box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+      }
+    }
+
+    /* AI Feature Styles */
+    .ai-card {
+      background-color: #f0fdfa;
+      border: 1px solid #99f6e4;
+    }
+    .gemini-btn {
+      background: linear-gradient(to right, #4f46e5, #8b5cf6);
+      transition: all 0.3s ease;
+    }
+    .gemini-btn:hover {
+      box-shadow: 0 0 20px rgba(139, 92, 246, 0.6);
+    }
+    .spinner {
+      border: 2px solid #f3f3f3;
+      border-top: 2px solid #8b5cf6;
+      border-radius: 50%;
+      width: 16px;
+      height: 16px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Splash, Watermark & Modal Styles */
+    #splash-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #ffffff;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.5s ease-out;
+    }
+    #watermark {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 0;
+      opacity: 0.05;
+      pointer-events: none;
+    }
+    #well-details-modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #well-details-modal-content {
+      max-height: 90vh;
+    }
+  </style>
+</head>
+<body>
+  <div id="splash-screen">
+    <img
+      id="splash-logo"
+      src=""
+      alt="Well-Tegra Data Solutions Logo"
+      class="w-48 h-auto mb-4"
+    />
+    <p class="text-gray-600">Initializing Integrated Ecosystem...</p>
+  </div>
+
+  <div
+    id="app-container"
+    class="min-h-screen flex flex-col"
+    style="visibility: hidden"
+  >
+    <div id="watermark">
+      <img
+        id="watermark-logo"
+        src=""
+        alt="Watermark"
+        class="w-40 h-auto"
+      />
+    </div>
+    <header
+      id="app-header"
+      class="bg-white shadow-sm sticky top-0 z-10 transition-colors"
+    >
+      <div class="max-w-full mx-auto py-3 px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <img
+              id="header-logo"
+              src=""
+              alt="Well-Tegra Data Solutions Logo"
+              class="h-10 w-auto"
+            />
+          </div>
+          <div id="header-details" class="flex items-center space-x-4"></div>
+        </div>
+      </div>
+    </header>
+
+    <main id="main-content" class="flex-1">
+      <!-- Planner View -->
+      <div
+        id="planner-view"
+        class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8"
+      >
+        <div class="mb-12 flex items-center justify-center space-x-4">
+          <div
+            id="step-1-indicator"
+            class="step-indicator w-10 h-10 rounded-full flex items-center justify-center font-bold"
+          >
+            1
+          </div>
+          <div class="flex-1 h-1 bg-gray-200 rounded-full">
+            <div
+              id="progress-1"
+              class="h-1 bg-teal-600 rounded-full w-0 transition-all duration-500"
+            ></div>
+          </div>
+          <div
+            id="step-2-indicator"
+            class="step-indicator bg-gray-200 text-gray-500 w-10 h-10 rounded-full flex items-center justify-center font-bold"
+          >
+            2
+          </div>
+          <div class="flex-1 h-1 bg-gray-200 rounded-full">
+            <div
+              id="progress-2"
+              class="h-1 bg-teal-600 rounded-full w-0 transition-all duration-500"
+            ></div>
+          </div>
+          <div
+            id="step-3-indicator"
+            class="step-indicator bg-gray-200 text-gray-500 w-10 h-10 rounded-full flex items-center justify-center font-bold"
+          >
+            3
+          </div>
+        </div>
+        <section id="step-1">
+          <div class="text-center">
+            <h2 class="text-3xl font-bold tracking-tight text-gray-900">
+              Step 1: Select Your Well (Single Source of Truth)
+            </h2>
+            <p class="mt-2 max-w-2xl mx-auto text-lg text-gray-600">
+              Connect directly to your system of record. No more outdated
+              spreadsheets.
+            </p>
+          </div>
+          <div
+            id="well-selection-grid"
+            class="mt-10 grid gap-8 md:grid-cols-2 lg:grid-cols-3"
+          ></div>
+        </section>
+        <section id="step-2" class="hidden">
+          <div class="text-center">
+            <h2 class="text-3xl font-bold tracking-tight text-gray-900">
+              Step 2: Define Intervention Objectives
+            </h2>
+            <p class="mt-2 max-w-2xl mx-auto text-lg text-gray-600">
+              Design and model in a collaborative space where all key data is
+              integrated.
+            </p>
+          </div>
+          <div class="mt-10 max-w-2xl mx-auto">
+            <fieldset id="objectives-fieldset" class="space-y-4"></fieldset>
+            <div class="mt-8 flex justify-center">
+              <button
+                id="generate-plan-btn"
+                class="rounded-md bg-teal-600 px-6 py-3 text-base font-semibold text-white shadow-sm hover:bg-teal-500 disabled:bg-gray-400"
+                disabled
+              >
+                Generate Integrated Plan
+              </button>
+            </div>
+          </div>
+        </section>
+        <section id="step-3" class="hidden">
+          <div class="text-center">
+            <h2 class="text-3xl font-bold tracking-tight text-gray-900">
+              Step 3: Review the Generated Plan
+            </h2>
+            <p class="mt-2 max-w-2xl mx-auto text-lg text-gray-600">
+              This is your data-driven plan. Review and then bridge the gap to
+              the well site.
+            </p>
+          </div>
+          <div
+            id="plan-output"
+            class="mt-10 light-card p-6 md:p-8 space-y-8"
+          ></div>
+          <div class="mt-8 flex justify-center space-x-4">
+            <button
+              id="start-over-btn"
+              class="rounded-md bg-gray-600 px-6 py-3 text-base font-semibold text-white shadow-sm hover:bg-gray-500"
+            >
+              Start Over
+            </button>
+            <button
+              id="begin-op-btn"
+              class="rounded-md bg-emerald-600 px-6 py-3 text-base font-semibold text-white shadow-sm hover:bg-emerald-500"
+            >
+              Begin Live Operation
+            </button>
+          </div>
+        </section>
+      </div>
+
+      <!-- Performer View -->
+      <div id="performer-view" class="hidden p-4 lg:p-6 h-full">
+        <div class="h-full dashboard-grid">
+          <div
+            id="procedure-panel"
+            class="bg-gray-900/50 rounded-lg p-4 flex flex-col"
+          >
+            <h2
+              class="text-lg font-semibold mb-4 border-b border-gray-700 pb-2"
+            >
+              Live Work Instructions
+            </h2>
+            <div
+              id="procedure-steps"
+              class="flex-1 space-y-3 overflow-y-auto pr-2"
+            ></div>
+            <div id="performer-controls" class="hidden mt-4">
+              <button
+                id="view-analysis-btn"
+                class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded-md transition"
+              >
+                Close Loop & Analyze
+              </button>
+            </div>
+          </div>
+          <div class="flex flex-col gap-4 lg:gap-6">
+            <div
+              id="performer-kpi-grid"
+              class="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-6"
+            ></div>
+            <div
+              id="chart-card"
+              class="flex-1 bg-gray-900/50 rounded-lg p-4 flex flex-col"
+            >
+              <h3 id="tfa-chart-title" class="text-lg font-semibold mb-2">
+                Manage by Exception: Plan vs. Actual
+              </h3>
+              <div class="flex-1 relative">
+                <canvas id="tfaChart"></canvas>
+              </div>
+            </div>
+          </div>
+          <div
+            class="bg-gray-900/50 rounded-lg p-4 flex flex-col"
+          >
+            <h2
+              class="text-lg font-semibold mb-4 border-b border-gray-700 pb-2"
+            >
+              Operations Log
+            </h2>
+            <div
+              id="log-entries"
+              class="flex-1 space-y-3 overflow-y-auto mb-4"
+            ></div>
+            <div id="manual-controls" class="mt-auto space-y-2">
+              <textarea
+                id="log-input"
+                class="w-full bg-gray-900 border border-gray-600 rounded-md p-2 text-sm"
+                rows="2"
+                placeholder="Add log entry..."
+              ></textarea>
+              <button
+                id="add-log-btn"
+                class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 px-4 rounded-md transition"
+              >
+                Add Entry
+              </button>
+              <button
+                id="advance-sim-btn"
+                class="w-full bg-teal-600 hover:bg-teal-500 text-white font-bold py-2 px-4 rounded-md transition"
+              >
+                Advance Time Step
+              </button>
+              <button
+                id="complete-step-btn"
+                class="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-2 px-4 rounded-md transition hidden"
+              >
+                Complete Step & Proceed
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Analyzer View -->
+      <div
+        id="analyzer-view"
+        class="hidden max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8"
+      >
+        <div class="text-center">
+          <h2 class="text-3xl font-bold tracking-tight text-gray-900">
+            Nexus Analyzer
+          </h2>
+          <p id="analyzer-subtitle" class="mt-2 max-w-2xl mx-auto text-lg text-gray-600"></p>
+        </div>
+        <div class="mt-10 grid gap-8 lg:grid-cols-2">
+          <div class="light-card p-6 md:p-8">
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">
+              Automated Performance KPIs
+            </h3>
+            <div
+              id="summary-kpis"
+              class="grid grid-cols-1 md:grid-cols-2 gap-6"
+            ></div>
+          </div>
+          <div class="light-card p-6 md:p-8">
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">
+              Nexus ROI Explorer
+            </h3>
+            <div id="roi-explorer" class="space-y-4"></div>
+          </div>
+        </div>
+        <div class="mt-8 grid gap-8 lg:grid-cols-2">
+          <div class="light-card p-6 md:p-8">
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">
+              Non-Productive Time (NPT) Breakdown
+            </h3>
+            <div class="h-64 md:h-80">
+              <canvas id="nptChart"></canvas>
+            </div>
+          </div>
+          <div class="light-card p-6 md:p-8">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-xl font-semibold text-gray-800">
+                Capture & Re-use Lessons Learned
+              </h3>
+              <button
+                id="suggest-lessons-btn"
+                class="gemini-btn text-white font-semibold py-2 px-4 rounded-lg flex items-center space-x-2"
+              >
+                <span class="button-icon">✨</span>
+                <span class="button-text">Suggest Lessons</span>
+              </button>
+            </div>
+            <div id="lessons-learned-list" class="space-y-4 mb-6"></div>
+            <div>
+              <textarea
+                id="lesson-input"
+                class="w-full border border-gray-300 rounded-md p-2 text-base"
+                rows="3"
+                placeholder="Add a new lesson learned..."
+              ></textarea>
+              <button
+                id="add-lesson-btn"
+                class="mt-2 rounded-md bg-teal-600 px-4 py-2 text-base font-semibold text-white shadow-sm hover:bg-teal-500"
+              >
+                Add Lesson
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="mt-8 flex justify-center">
+          <button
+            id="plan-new-job-btn"
+            class="rounded-md bg-gray-600 px-6 py-3 text-base font-semibold text-white shadow-sm hover:bg-gray-500"
+          >
+            Engineer the Next Operation
+          </button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Well Details Modal -->
+  <div id="well-details-modal-backdrop" class="hidden">
+    <div
+      id="well-details-modal-content"
+      class="bg-white rounded-lg shadow-xl w-full max-w-4xl m-4 overflow-y-auto"
+    >
+      <!-- Modal content will be injected here -->
+    </div>
+  </div>
+  <script>
+    // --- STATE MANAGEMENT ---
+    let currentStep = 1;
+    let selectedWell = null;
+    let selectedObjective = null;
+    let generatedPlan = null;
+    let operationInProgress = false;
+    let currentStepIndex = 0;
+    let timeAndCostData = {
+      labels: [],
+      planned: [],
+      actual: [],
+    };
+    let nptData = {};
+    let chart;
+
+    // --- DOM ELEMENTS ---
+    const splashScreen = document.getElementById("splash-screen");
+    const appContainer = document.getElementById("app-container");
+    const headerLogo = document.getElementById("header-logo");
+    const watermarkLogo = document.getElementById("watermark-logo");
+    const headerDetails = document.getElementById("header-details");
+    const step1Indicator = document.getElementById("step-1-indicator");
+    const step2Indicator = document.getElementById("step-2-indicator");
+    const step3Indicator = document.getElementById("step-3-indicator");
+    const progress1 = document.getElementById("progress-1");
+    const progress2 = document.getElementById("progress-2");
+    const plannerView = document.getElementById("planner-view");
+    const performerView = document.getElementById("performer-view");
+    const analyzerView = document.getElementById("analyzer-view");
+    const wellSelectionGrid = document.getElementById("well-selection-grid");
+    const objectivesFieldset = document.getElementById("objectives-fieldset");
+    const generatePlanBtn = document.getElementById("generate-plan-btn");
+    const planOutput = document.getElementById("plan-output");
+    const startOverBtn = document.getElementById("start-over-btn");
+    const beginOpBtn = document.getElementById("begin-op-btn");
+    const procedureStepsContainer = document.getElementById("procedure-steps");
+    const performerControls = document.getElementById("performer-controls");
+    const viewAnalysisBtn = document.getElementById("view-analysis-btn");
+    const logEntries = document.getElementById("log-entries");
+    const logInput = document.getElementById("log-input");
+    const addLogBtn = document.getElementById("add-log-btn");
+    const advanceSimBtn = document.getElementById("advance-sim-btn");
+    const completeStepBtn = document.getElementById("complete-step-btn");
+    const performerKpiGrid = document.getElementById("performer-kpi-grid");
+    const analyzerSubtitle = document.getElementById("analyzer-subtitle");
+    const summaryKpis = document.getElementById("summary-kpis");
+    const roiExplorer = document.getElementById("roi-explorer");
+    const nptChartCanvas = document.getElementById("nptChart");
+    const lessonsLearnedList = document.getElementById("lessons-learned-list");
+    const lessonInput = document.getElementById("lesson-input");
+    const addLessonBtn = document.getElementById("add-lesson-btn");
+    const planNewJobBtn = document.getElementById("plan-new-job-btn");
+    const modalBackdrop = document.getElementById("well-details-modal-backdrop");
+    const modalContent = document.getElementById("well-details-modal-content");
+
+    // --- DATA ---
+    const wells = [
+      {
+        id: 'well-001',
+        name: 'Whiskey-Alpha-7',
+        location: 'North Sea, Block 211/27a',
+        status: 'Active Producer',
+        depth: '10,500 ft',
+        type: 'Oil Well',
+        last_inspection: '2023-08-15',
+        image: 'https://images.unsplash.com/photo-1588626242338-713440724985?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+        details: {
+          api: '34-017-21118',
+          spud_date: '2010-05-20',
+          completion_date: '2010-08-15',
+          fluid_type: 'Light Crude',
+          current_rate: '2,500 bopd',
+          water_cut: '15%',
+          gor: '850 scf/bbl',
+          pressure: '2100 psi'
+        }
+      },
+      {
+        id: 'well-002',
+        name: 'Bravo-Zulu-3',
+        location: 'Permian Basin, Texas',
+        status: 'Shut-in',
+        depth: '12,800 ft',
+        type: 'Gas Injector',
+        last_inspection: '2022-11-01',
+        image: 'https://images.unsplash.com/photo-1588626242338-713440724985?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+        details: {
+          api: '42-301-34567',
+          spud_date: '2015-02-10',
+          completion_date: '2015-05-22',
+          fluid_type: 'Dry Gas',
+          current_rate: '0 MMscf/d',
+          water_cut: 'N/A',
+          pressure: '3500 psi'
+        }
+      },
+      {
+        id: 'well-003',
+        name: 'Charlie-Delta-9',
+        location: 'Gulf of Mexico, Block 72',
+        status: 'Active Producer',
+        depth: '15,200 ft',
+        type: 'Oil Well',
+        last_inspection: '2023-10-05',
+        image: 'https://images.unsplash.com/photo-1588626242338-713440724985?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+        details: {
+          api: '60-809-12345',
+          spud_date: '2018-09-01',
+          completion_date: '2018-12-18',
+          fluid_type: 'Medium Crude',
+          current_rate: '1,800 bopd',
+          water_cut: '25%',
+          gor: '1200 scf/bbl',
+          pressure: '2800 psi'
+        }
+      },
+      {
+        id: 'well-004',
+        name: 'Echo-Foxtrot-1',
+        location: 'Bakken Shale, North Dakota',
+        status: 'Active Producer',
+        depth: '9,800 ft',
+        type: 'Oil Well (Fracked)',
+        last_inspection: '2023-09-20',
+        image: 'https://images.unsplash.com/photo-1588626242338-713440724985?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+        details: {
+          api: '33-025-98765',
+          spud_date: '2019-03-11',
+          completion_date: '2019-06-01',
+          fluid_type: 'Light Sweet Crude',
+          current_rate: '1,200 bopd',
+          water_cut: '5%',
+          gor: '600 scf/bbl',
+          pressure: '1800 psi'
+        }
+      },
+    ];
+
+    const objectives = [
+      { id: 'stimulate', name: 'Stimulate Well', description: 'Increase production by stimulating the reservoir.' },
+      { id: 'water_shutoff', name: 'Water Shut-off', description: 'Reduce water production from the well.' },
+      { id: 'integrity_check', name: 'Well Integrity Check', description: 'Perform tests to ensure well integrity.' },
+      { id: 'recompletion', name: 'Recompletion', description: 'Recomplete the well in a different zone.' }
+    ];
+
+    // --- INITIALIZATION ---
+    function initializeApp() {
+      // Set the company logo
+      const logoUrl = "https://i.imgur.com/q122hSc.png";
+      document.getElementById('splash-logo').src = logoUrl;
+      document.getElementById('header-logo').src = logoUrl;
+      document.getElementById('watermark-logo').src = logoUrl;
+      
+      // Simulate loading
+      setTimeout(() => {
+        splashScreen.style.opacity = '0';
+        setTimeout(() => {
+          splashScreen.style.display = 'none';
+          appContainer.style.visibility = 'visible';
+        }, 500);
+      }, 1500);
+      
+      renderWells();
+      renderObjectives();
+      addEventListeners();
+      updateStepUI();
+    }
+
+    // --- RENDERING FUNCTIONS ---
+    function renderWells() {
+      wellSelectionGrid.innerHTML = '';
+      wells.forEach(well => {
+        const card = document.createElement('div');
+        card.className = 'planner-card bg-white rounded-lg shadow-md p-6 cursor-pointer hover:shadow-lg transition-shadow';
+        card.dataset.wellId = well.id;
+        card.innerHTML = `
+          <img src="${well.image}" alt="${well.name}" class="w-full h-40 object-cover rounded-md mb-4">
+          <h3 class="text-xl font-bold text-gray-800">${well.name}</h3>
+          <p class="text-gray-600">${well.location}</p>
+          <div class="mt-4 flex justify-between items-center text-sm">
+            <span class="px-2 py-1 rounded-full ${well.status === 'Active Producer' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">${well.status}</span>
+            <button class="view-details-btn text-teal-600 hover:text-teal-800 font-semibold" data-well-id="${well.id}">View Details</button>
+          </div>
+        `;
+        wellSelectionGrid.appendChild(card);
+      });
+    }
+
+    function renderObjectives() {
+      objectives.forEach(obj => {
+        const div = document.createElement('div');
+        div.innerHTML = `
+          <input type="radio" name="objective" id="${obj.id}" value="${obj.id}" class="hidden peer">
+          <label for="${obj.id}" class="objective-label block p-4 rounded-lg border-2 border-gray-200 hover:bg-gray-50 peer-checked:border-teal-500 peer-checked:bg-teal-50">
+            <h4 class="font-semibold text-lg">${obj.name}</h4>
+            <p class="text-gray-500 text-sm">${obj.description}</p>
+          </label>
+        `;
+        objectivesFieldset.appendChild(div);
+      });
+    }
+
+    function renderPlan(plan) {
+      planOutput.innerHTML = `
+        <h3 class="text-2xl font-bold text-gray-800 mb-4">Proposed Intervention Plan</h3>
+        <div class="space-y-6">
+          <div>
+            <h4 class="font-semibold text-lg text-gray-700">Objective</h4>
+            <p class="text-gray-600">${plan.objective}</p>
+          </div>
+          <div>
+            <h4 class="font-semibold text-lg text-gray-700">Recommended Actions</h4>
+            <ul class="list-disc list-inside space-y-2 mt-2 text-gray-600">
+              ${plan.steps.map(step => `<li>${step}</li>`).join('')}
+            </ul>
+          </div>
+          <div>
+            <h4 class="font-semibold text-lg text-gray-700">Estimated Duration & Cost</h4>
+            <p class="text-gray-600">Duration: ${plan.duration}</p>
+            <p class="text-gray-600">Estimated Cost: ${plan.cost}</p>
+          </div>
+          <div>
+            <h4 class="font-semibold text-lg text-gray-700">Risk Assessment</h4>
+            <p class="text-gray-600">Overall Risk: <span class="font-bold px-2 py-1 rounded ${getRiskClass(plan.risk)}">${plan.risk}</span></p>
+            <ul class="list-disc list-inside space-y-1 mt-2 text-gray-600">
+              ${plan.risks.map(risk => `<li>${risk}</li>`).join('')}
+            </ul>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderPerformerUI(plan) {
+      document.body.classList.remove('planner-view');
+      document.body.classList.add('performer-view');
+      plannerView.classList.add('hidden');
+      performerView.classList.remove('hidden');
+      analyzerView.classList.add('hidden');
+
+      // Update header
+      headerDetails.innerHTML = `
+        <div class="text-right">
+          <p class="text-sm font-medium text-gray-500">Well</p>
+          <p class="text-lg font-bold">${selectedWell.name}</p>
+        </div>
+        <div class="text-right">
+          <p class="text-sm font-medium text-gray-500">Objective</p>
+          <p class="text-lg font-bold">${selectedObjective.name}</p>
+        </div>
+      `;
+
+      // Render procedure steps
+      procedureStepsContainer.innerHTML = plan.steps.map((step, index) => `
+        <div class="procedure-step p-4" id="step-${index}">
+          <div class="flex items-center">
+            <div class="flex-shrink-0 w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center mr-4 text-white font-bold">${index + 1}</div>
+            <p class="text-lg">${step}</p>
+          </div>
+        </div>
+      `).join('');
+      
+      // Initialize chart
+      const ctx = document.getElementById('tfaChart').getContext('2d');
+      chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: [],
+          datasets: [
+            {
+              label: 'Planned Time (days)',
+              data: [],
+              borderColor: 'rgba(75, 192, 192, 1)',
+              backgroundColor: 'rgba(75, 192, 192, 0.2)',
+              fill: false,
+            },
+            {
+              label: 'Actual Time (days)',
+              data: [],
+              borderColor: 'rgba(255, 99, 132, 1)',
+              backgroundColor: 'rgba(255, 99, 132, 0.2)',
+              fill: false,
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: 'Operation Step'
+              }
+            },
+            y: {
+              title: {
+                display: true,
+                text: 'Cumulative Days'
+              }
+            }
+          }
+        }
+      });
+
+      updatePerformerUI();
+    }
+
+    function renderAnalyzerView() {
+      document.body.classList.remove('performer-view');
+      document.body.classList.add('analyzer-view');
+      performerView.classList.add('hidden');
+      analyzerView.classList.remove('hidden');
+
+      analyzerSubtitle.textContent = `Post-Operation Analysis for ${selectedWell.name}`;
+
+      const totalPlannedTime = generatedPlan.steps.reduce((acc, step) => acc + step.duration, 0);
+      const totalActualTime = timeAndCostData.actual.reduce((a, b) => a + b, 0);
+      const npt = totalActualTime - totalPlannedTime;
+      const efficiency = (totalPlannedTime / totalActualTime) * 100;
+
+      summaryKpis.innerHTML = `
+        <div>
+          <p class="text-sm text-gray-500">Planned Duration</p>
+          <p class="text-2xl font-bold">${totalPlannedTime.toFixed(1)} days</p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500">Actual Duration</p>
+          <p class="text-2xl font-bold">${totalActualTime.toFixed(1)} days</p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500">Non-Productive Time (NPT)</p>
+          <p class="text-2xl font-bold ${npt > 0 ? 'text-red-500' : 'text-green-500'}">${npt.toFixed(1)} days</p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500">Operational Efficiency</p>
+          <p class="text-2xl font-bold ${efficiency < 80 ? 'text-red-500' : 'text-green-500'}">${efficiency.toFixed(1)}%</p>
+        </div>
+      `;
+
+      // ROI Explorer (simplified)
+      roiExplorer.innerHTML = `
+        <p>ROI analysis would be displayed here, comparing the cost of the intervention with the value of increased production.</p>
+      `;
+
+      // NPT Chart
+      const nptCtx = document.getElementById('nptChart').getContext('2d');
+      new Chart(nptCtx, {
+        type: 'doughnut',
+        data: {
+          labels: Object.keys(nptData),
+          datasets: [{
+            label: 'NPT by Cause',
+            data: Object.values(nptData),
+            backgroundColor: [
+              'rgba(255, 99, 132, 0.7)',
+              'rgba(54, 162, 235, 0.7)',
+              'rgba(255, 206, 86, 0.7)',
+              'rgba(75, 192, 192, 0.7)',
+              'rgba(153, 102, 255, 0.7)',
+            ],
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+        }
+      });
+
+      // Lessons Learned
+      lessonsLearnedList.innerHTML = ''; // Clear previous
+    }
+
+    // --- LOGIC & EVENT HANDLERS ---
+
+    function updateStepUI(newStep) {
+      if (newStep) currentStep = newStep;
+      
+      [step1Indicator, step2Indicator, step3Indicator].forEach((el, index) => {
+        el.classList.remove('active', 'completed');
+        if (index + 1 < currentStep) {
+          el.classList.add('completed');
+        } else if (index + 1 === currentStep) {
+          el.classList.add('active');
+        }
+      });
+
+      [progress1, progress2].forEach((el, index) => {
+        if (currentStep > index + 1) {
+          el.style.width = '100%';
+        } else {
+          el.style.width = '0%';
+        }
+      });
+
+      document.getElementById('step-1').classList.toggle('hidden', currentStep !== 1);
+      document.getElementById('step-2').classList.toggle('hidden', currentStep !== 2);
+      document.getElementById('step-3').classList.toggle('hidden', currentStep !== 3);
+    }
+
+    function handleWellSelection(e) {
+      const card = e.target.closest('.planner-card');
+      if (!card) return;
+
+      const wellId = card.dataset.wellId;
+      selectedWell = wells.find(w => w.id === wellId);
+
+      document.querySelectorAll('.planner-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+
+      updateStepUI(2);
+    }
+
+    function handleObjectiveSelection() {
+      const selectedRadio = document.querySelector('input[name="objective"]:checked');
+      selectedObjective = objectives.find(o => o.id === selectedRadio.value);
+      generatePlanBtn.disabled = !selectedObjective;
+    }
+
+    async function handleGeneratePlan() {
+      generatePlanBtn.disabled = true;
+      generatePlanBtn.innerHTML = '<div class="spinner"></div> Generating...';
+
+      // Mock AI call
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
+      generatedPlan = generateMockPlan(selectedWell, selectedObjective);
+      renderPlan(generatedPlan);
+      updateStepUI(3);
+      generatePlanBtn.innerHTML = 'Generate Integrated Plan';
+    }
+
+    function generateMockPlan(well, objective) {
+      let steps = [];
+      let risks = [];
+      let duration = 0;
+
+      switch (objective.id) {
+        case 'stimulate':
+          steps = [
+            "Prepare wellbore for stimulation.",
+            "Pump acidizing fluid into the formation.",
+            "Monitor well pressure and flowback.",
+            "Bring well back online and test production."
+          ];
+          risks = ["Formation damage", "Fluid incompatibility", "Equipment failure"];
+          duration = 5;
+          break;
+        case 'water_shutoff':
+          steps = [
+            "Identify water entry points using production logs.",
+            "Isolate the water-producing zone.",
+            "Pump sealant or polymer gel.",
+            "Allow for curing and test effectiveness."
+          ];
+          risks = ["Incomplete shut-off", "Damage to oil-producing zones", "Casing integrity issues"];
+          duration = 7;
+          break;
+        case 'integrity_check':
+          steps = [
+            "Run pressure tests on tubing and casing.",
+            "Perform a cement bond log (CBL).",
+            "Conduct a multi-finger caliper log.",
+            "Analyze results and recommend remedial actions."
+          ];
+          risks = ["Tool failure downhole", "Inconclusive log results"];
+          duration = 3;
+          break;
+        case 'recompletion':
+          steps = [
+            "Isolate the current production zone.",
+            "Perforate the new target zone.",
+            "Run production logging tools to confirm flow.",
+            "Optimize production from the new zone."
+          ];
+          risks = ["Formation damage in new zone", "Issues with zonal isolation", "Higher than expected water cut"];
+          duration = 10;
+          break;
+      }
+      return {
+        objective: objective.name,
+        steps: steps.map((s, i) => ({ text: s, duration: Math.random() + 1, completed: false })),
+        duration: duration,
+        cost: `$${(Math.random() * 500000 + 100000).toFixed(0)}`,
+        risk: ['Low', 'Medium', 'High'][Math.floor(Math.random() * 3)],
+        risks: risks
+      };
+    }
+
+    function getRiskClass(riskLevel) {
+      switch (riskLevel) {
+        case 'Low': return 'bg-green-100 text-green-800';
+        case 'Medium': return 'bg-yellow-100 text-yellow-800';
+        case 'High': return 'bg-red-100 text-red-800';
+        default: return 'bg-gray-100 text-gray-800';
+      }
+    }
+
+    function handleBeginOperation() {
+      operationInProgress = true;
+      currentStepIndex = 0;
+      timeAndCostData = {
+        labels: generatedPlan.steps.map((s, i) => `Step ${i+1}`),
+        planned: generatedPlan.steps.map(s => s.duration),
+        actual: []
+      };
+      nptData = {};
+      renderPerformerUI(generatedPlan);
+    }
+
+    function updatePerformerUI() {
+      // Update KPI Cards
+      const totalPlannedTime = timeAndCostData.planned.reduce((a, b) => a + b, 0);
+      const currentActualTime = timeAndCostData.actual.reduce((a, b) => a + b, 0);
+      const variance = currentActualTime - totalPlannedTime;
+      performerKpiGrid.innerHTML = `
+        <div class="kpi-card p-4">
+          <p class="text-sm text-gray-400">Current Step</p>
+          <p class="text-2xl font-bold">${currentStepIndex + 1} / ${generatedPlan.steps.length}</p>
+        </div>
+        <div class="kpi-card p-4">
+          <p class="text-sm text-gray-400">Planned Duration</p>
+          <p class="text-2xl font-bold">${totalPlannedTime.toFixed(1)} days</p>
+        </div>
+        <div class="kpi-card p-4">
+          <p class="text-sm text-gray-400">Actual Time</p>
+          <p class="text-2xl font-bold">${currentActualTime.toFixed(1)} days</p>
+        </div>
+        <div class="kpi-card p-4 ${variance > 0 ? 'alarm' : ''}">
+          <p class="text-sm text-gray-400">Time Variance</p>
+          <p class="text-2xl font-bold ${variance > 0 ? 'text-red-500' : 'text-green-500'}">
+            ${variance > 0 ? '+' : ''}${variance.toFixed(1)} days
+          </p>
+        </div>
+      `;
+
+      // Update Procedure Steps
+      document.querySelectorAll('.procedure-step').forEach((el, index) => {
+        el.classList.remove('active', 'completed');
+        if (index < currentStepIndex) {
+          el.classList.add('completed');
+        } else if (index === currentStepIndex) {
+          el.classList.add('active');
+        }
+      });
+
+      // Update Chart
+      chart.data.labels = timeAndCostData.labels;
+      chart.data.datasets[0].data = timeAndCostData.planned;
+      chart.data.datasets[1].data = timeAndCostData.actual;
+      chart.update();
+
+      // Show/Hide buttons
+      if (currentStepIndex >= generatedPlan.steps.length) {
+        advanceSimBtn.classList.add('hidden');
+        completeStepBtn.classList.add('hidden');
+        performerControls.classList.remove('hidden');
+      } else {
+        advanceSimBtn.classList.remove('hidden');
+        completeStepBtn.classList.add('hidden');
+        performerControls.classList.add('hidden');
+      }
+    }
+
+    function addLog(message, type = 'info') {
+      const time = new Date().toLocaleTimeString();
+      const logItem = document.createElement('div');
+      logItem.className = 'log-entry pb-2';
+      let colorClass = 'text-gray-400';
+      if (type === 'user') colorClass = 'text-blue-400';
+      if (type === 'system') colorClass = 'text-green-400';
+      if (type === 'warning') colorClass = 'text-yellow-400';
+      if (type === 'error') colorClass = 'text-red-400';
+      logItem.innerHTML = `<span class="font-mono text-xs text-gray-500">${time}</span> <span class="${colorClass}">${message}</span>`;
+      logEntries.appendChild(logItem);
+      logEntries.scrollTop = logEntries.scrollHeight;
+    }
+
+    function handleAdvanceTime() {
+      if (!operationInProgress || currentStepIndex >= generatedPlan.steps.length) return;
+
+      const step = generatedPlan.steps[currentStepIndex];
+      const actualDuration = step.duration + (Math.random() - 0.25); // Simulate some variance
+      timeAndCostData.actual.push(actualDuration);
+
+      addLog(`Step ${currentStepIndex + 1} completed. Duration: ${actualDuration.toFixed(1)} days (Planned: ${step.duration.toFixed(1)} days).`, 'system');
+
+      if (actualDuration > step.duration * 1.2) {
+        const nptReason = "Weather Delay";
+        nptData[nptReason] = (nptData[nptReason] || 0) + (actualDuration - step.duration);
+        addLog(`NPT detected: ${nptReason} (${(actualDuration - step.duration).toFixed(1)} days)`, 'warning');
+      }
+
+      currentStepIndex++;
+      updatePerformerUI();
+    }
+    
+    function showWellDetails(wellId) {
+      const well = wells.find(w => w.id === wellId);
+      if (!well) return;
+
+      modalContent.innerHTML = `
+        <div class="p-6">
+          <div class="flex justify-between items-start">
+            <h2 class="text-2xl font-bold text-gray-900">${well.name}</h2>
+            <button id="close-modal-btn" class="text-gray-400 hover:text-gray-600">&times;</button>
+          </div>
+          <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700">
+            <div><strong>Location:</strong> ${well.location}</div>
+            <div><strong>Status:</strong> ${well.status}</div>
+            <div><strong>Depth:</strong> ${well.depth}</div>
+            <div><strong>Type:</strong> ${well.type}</div>
+            <div><strong>Last Inspection:</strong> ${well.last_inspection}</div>
+            <div><strong>API Number:</strong> ${well.details.api}</div>
+            <div><strong>Spud Date:</strong> ${well.details.spud_date}</div>
+            <div><strong>Completion Date:</strong> ${well.details.completion_date}</div>
+            <div><strong>Fluid Type:</strong> ${well.details.fluid_type}</div>
+            <div><strong>Current Rate:</strong> ${well.details.current_rate}</div>
+            <div><strong>Water Cut:</strong> ${well.details.water_cut}</div>
+            <div><strong>GOR:</strong> ${well.details.gor}</div>
+            <div><strong>Pressure:</strong> ${well.details.pressure}</div>
+          </div>
+        </div>
+      `;
+      modalBackdrop.classList.remove('hidden');
+      document.getElementById('close-modal-btn').addEventListener('click', () => modalBackdrop.classList.add('hidden'));
+    }
+
+    // --- Event Listeners ---
+    function addEventListeners() {
+      wellSelectionGrid.addEventListener('click', (e) => {
+        if (e.target.classList.contains('view-details-btn')) {
+          e.stopPropagation(); // Prevent card selection
+          showWellDetails(e.target.dataset.wellId);
+        } else {
+          handleWellSelection(e);
+        }
+      });
+      objectivesFieldset.addEventListener('change', handleObjectiveSelection);
+      generatePlanBtn.addEventListener('click', handleGeneratePlan);
+      startOverBtn.addEventListener('click', () => {
+        location.reload(); // Simple reset
+      });
+      beginOpBtn.addEventListener('click', handleBeginOperation);
+      addLogBtn.addEventListener('click', () => {
+        if (logInput.value.trim()) {
+          addLog(`User: ${logInput.value.trim()}`, 'user');
+          logInput.value = '';
+        }
+      });
+      advanceSimBtn.addEventListener('click', handleAdvanceTime);
+      viewAnalysisBtn.addEventListener('click', renderAnalyzerView);
+      planNewJobBtn.addEventListener('click', () => {
+        location.reload(); // Simple reset
+      });
+    }
+
+    // --- Main Execution ---
+    document.addEventListener('DOMContentLoaded', initializeApp);
+  })();
+  </script>
+</body>
+</html>
