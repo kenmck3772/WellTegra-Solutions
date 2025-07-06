@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Integra Well Data: The Business Case for Integrated Operations</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- 
+    Chosen Palette: Professional Tech (Light Gray, Deep Blue, Teal Accent)
+    Application Structure Plan: A narrative-driven, single-page application guiding users from the core industry problem to the financial ROI of the WellTegra Solutions platform. Key sections include an interactive ROI calculator and a clear breakdown of the platform's modules. This structure is chosen to build a business case for the user, rather than just presenting report data.
+    Visualization & Content Choices: Problem section uses interactive cards (HTML/CSS) to simplify complex issues. Solution section uses a clear three-column layout. The core interactive element is the ROI calculator (HTML sliders, JS logic) which dynamically updates a Chart.js bar chart and numeric outputs. This transforms static financial data into an engaging, persuasive tool. Competitive analysis is a simple HTML table for clarity.
+    CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
+    -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+        .main-container::before {
+            content: "";
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/2wBDAQMDAwQDBAgEBAgQCwkLEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBD/wAARCAEOARQDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1fBICEjYnEUMoGRoQgjQrHBFVLR8CQzYnKCCQoWFxgZGiUmJygpKjQ1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4eLj5OXm5+jp6vHy8/T19vf4+fr/xAAfAQADAQEBAQEBAQEBAAAAAAAAAQIDBAQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP3+Pn6/9oADAMBAAIRAxEAPwD9/KKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigA-igAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigA-igAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA=');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.05;
+            z-index: -1;
+            pointer-events: none;
+        }
+        .hero-bg {
+            background-color: #0f172a;
+            color: white;
+        }
+        .section-title {
+            font-size: 2.25rem;
+            font-weight: 800;
+            letter-spacing: -0.025em;
+        }
+        .accent-text {
+            color: #0d9488;
+        }
+        .feature-card {
+            background-color: white;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        .roi-calculator {
+            background-color: #e2e8f0;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) { .chart-container { height: 400px; } }
+    </style>
+</head>
+<body class="main-container">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-10 bg-white/80 backdrop-blur-md shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <a href="https://photos.google.com/photo/AF1QipPH246bc6xMDOrItx_VV1A1l-L9aDVGWCruFSyZ" target="_blank" class="flex items-center">
+                    <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/2wBDAQMDAwQDBAgEBAgQCwkLEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBD/wAARCAEOARQDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1fBICEjYnEUMoGRoQgjQrHBFVLR8CQzYnKCCQoWFxgZGiUmJygpKjQ1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4eLj5OXm5+jp6vHy8/T19vf4+fr/xAAfAQADAQEBAQEBAQEBAAAAAAAAAQIDBAQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP3+Pn6/9oADAMBAAIRAxEAPwD9/KKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigA-igAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigA-igAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA=" alt="Integra Well Data Logo" class="h-12 w-auto mr-4">
+                    <h1 class="text-2xl font-bold">Integra Well Data</h1>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-bg py-20 px-4 relative">
+        <div class="max-w-4xl mx-auto text-center relative z-10">
+            <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight">Stop Burning Time. Start Optimizing Wells.</h1>
+            <p class="mt-6 text-lg md:text-xl text-slate-300">The oil and gas industry loses over $38 million per asset annually to unplanned downtime. Your engineers spend more than 50% of their time wrangling data. The cause? A disconnected digital ecosystem.</p>
+            <p class="mt-4 text-lg md:text-xl font-semibold text-white">Integra Well Data transforms your operational data from a liability into your most valuable asset.</p>
+        </div>
+    </section>
+
+    <!-- Problem Section -->
+    <section class="py-20 px-4 bg-white relative">
+        <div class="max-w-5xl mx-auto relative z-10">
+            <div class="text-center">
+                <h2 class="section-title">Are You Paying the Hidden Taxes of Inefficiency?</h2>
+                <p class="mt-4 text-lg text-slate-600">Your operations are being taxed by disconnected workflows you can't see on a balance sheet.</p>
+            </div>
+            <div class="mt-12 grid md:grid-cols-3 gap-8">
+                <div class="feature-card">
+                    <h3 class="text-xl font-bold">The Data Wrangling Tax</h3>
+                    <p class="mt-2 text-slate-600">Your most valuable assets—your engineers—are forced to act as data clerks, wasting countless hours hunting for information in emails, correcting spreadsheet errors, and re-entering data from PDFs.</p>
+                </div>
+                <div class="feature-card">
+                    <h3 class="text-xl font-bold">The NPT Tax</h3>
+                    <p class="mt-2 text-slate-600">Every moment of Non-Productive Time is a direct hit to your bottom line. Plans based on poor data lead to equipment failures, procedural errors, and costly downtime.</p>
+                </div>
+                <div class="feature-card">
+                    <h3 class="text-xl font-bold">The Collaboration Tax</h3>
+                    <p class="mt-2 text-slate-600">The critical gap between your team and service partners is where value is lost. Static PDF handoffs create slow, error-prone workflows that prevent true, real-time collaboration.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Solution Section -->
+    <section class="py-20 px-4 relative">
+        <div class="max-w-5xl mx-auto relative z-10">
+            <div class="text-center">
+                <h2 class="section-title">The Solution: One Platform, End-to-End Control.</h2>
+                <p class="mt-4 text-lg text-slate-600">Integra Well Data replaces digital fragmentation with a single, intelligent ecosystem for the entire well lifecycle.</p>
+            </div>
+            <div class="mt-12 grid md:grid-cols-3 gap-8 text-center">
+                <div class="p-8">
+                    <h3 class="text-2xl font-bold accent-text">The Integra Planner</h3>
+                    <p class="mt-2 text-slate-600">Plan with confidence. Design, model, and approve every operation in a collaborative environment, integrating well history, live logistics, and predictive AI.</p>
+                </div>
+                <div class="p-8">
+                    <h3 class="text-2xl font-bold accent-text">The Integra Performer</h3>
+                    <p class="mt-2 text-slate-600">Execute with certainty. Transform your plan into live instructions for the wellsite, overlaying real-time data on engineering models for management by exception.</p>
+                </div>
+                <div class="p-8">
+                    <h3 class="text-2xl font-bold accent-text">The Integra Analyzer</h3>
+                    <p class="mt-2 text-slate-600">Learn from every job. Automate post-job reporting, instantly comparing planned vs. actual performance to create a powerful continuous improvement loop.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ROI Calculator Section -->
+    <section class="py-20 px-4 roi-calculator relative">
+        <div class="max-w-6xl mx-auto relative z-10">
+            <div class="text-center">
+                <h2 class="section-title">The Platform That Pays for Itself</h2>
+                <p class="mt-4 text-lg text-slate-700">Use our interactive calculator to estimate your potential annual savings with Integra Well Data.</p>
+            </div>
+            <div class="mt-12 grid lg:grid-cols-2 gap-8 items-center">
+                <div class="bg-white p-8 rounded-lg shadow-lg">
+                    <div class="space-y-6">
+                        <div>
+                            <label for="engineerCount" class="font-semibold">Number of Well Engineers</label>
+                            <div class="flex items-center space-x-4">
+                                <input type="range" id="engineerCount" min="5" max="100" value="20" class="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer">
+                                <span id="engineerCountValue" class="font-bold text-lg w-12 text-center">20</span>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="nptReduction" class="font-semibold">Projected NPT Reduction</label>
+                            <div class="flex items-center space-x-4">
+                                <input type="range" id="nptReduction" min="5" max="40" value="20" class="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer">
+                                <span id="nptReductionValue" class="font-bold text-lg w-12 text-center">20%</span>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="timeSavings" class="font-semibold">Engineering Time Reclaimed from Data Wrangling</label>
+                            <div class="flex items-center space-x-4">
+                                <input type="range" id="timeSavings" min="10" max="50" value="40" class="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer">
+                                <span id="timeSavingsValue" class="font-bold text-lg w-12 text-center">40%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-8 pt-6 border-t border-slate-300 text-center">
+                        <p class="text-xl font-semibold">Total Estimated Annual Savings:</p>
+                        <p id="totalSavings" class="text-5xl font-extrabold accent-text mt-2">$2,168,000</p>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="savingsChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Competitive Landscape Section -->
+    <section class="py-20 px-4 relative">
+        <div class="max-w-5xl mx-auto relative z-10">
+            <div class="text-center">
+                <h2 class="section-title">A Truly Open Ecosystem</h2>
+                <p class="mt-4 text-lg text-slate-600">While other platforms are powerful, Integra Well Data is designed from the ground up to be truly vendor-agnostic, giving you the flexibility to use the best tools for the job.</p>
+            </div>
+            <div class="mt-12 overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-100">
+                            <th class="p-4 font-bold">Capability</th>
+                            <th class="p-4 font-bold text-teal-600">Integra Well Data</th>
+                            <th class="p-4 font-bold">SLB Delfi / Halliburton Suite</th>
+                            <th class="p-4 font-bold">Stimline IDEX</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-b border-slate-200">
+                            <td class="p-4">Vendor Agnosticism</td>
+                            <td class="p-4 font-semibold text-teal-600">High</td>
+                            <td class="p-4">Medium (Ecosystem-centric)</td>
+                            <td class="p-4">Medium (Focused Suite)</td>
+                        </tr>
+                        <tr class="border-b border-slate-200 bg-slate-50">
+                            <td class="p-4">Operator-Service Co. Workflow</td>
+                            <td class="p-4 font-semibold text-teal-600">High (Core Focus)</td>
+                            <td class="p-4">Medium</td>
+                            <td class="p-4">High</td>
+                        </tr>
+                        <tr class="border-b border-slate-200">
+                            <td class="p-4">Lifecycle-Centric Data Model</td>
+                            <td class="p-4 font-semibold text-teal-600">Yes (Digital Plan Object)</td>
+                            <td class="p-4">App-centric</td>
+                            <td class="p-4">App-centric</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action Section -->
+    <footer class="hero-bg py-16 px-4">
+        <div class="max-w-4xl mx-auto text-center">
+            <h2 class="text-3xl md:text-4xl font-extrabold">See What Integrated Operations Can Do for Your Bottom Line.</h2>
+            <p class="mt-4 text-lg text-slate-300">Stop paying the hidden taxes of inefficiency. Let us show you how Integra Well Data can reduce your NPT, empower your engineers, and enhance your production.</p>
+            <button class="mt-8 bg-teal-500 hover:bg-teal-400 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition-transform transform hover:scale-105">
+                Schedule Your Personalized Demo
+            </button>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const engineerCountSlider = document.getElementById('engineerCount');
+            const nptReductionSlider = document.getElementById('nptReduction');
+            const timeSavingsSlider = document.getElementById('timeSavings');
+            const engineerCountValue = document.getElementById('engineerCountValue');
+            const nptReductionValue = document.getElementById('nptReductionValue');
+            const timeSavingsValue = document.getElementById('timeSavingsValue');
+            const totalSavingsValue = document.getElementById('totalSavings');
+
+            const ctx = document.getElementById('savingsChart').getContext('2d');
+            let savingsChart;
+
+            const baseData = {
+                avgAnnualDowntimeCost: 38000000,
+                attributableNPTFactor: 0.25,
+                avgEngineerBurdenedSalary: 200000,
+                timeWastedFactor: 0.50,
+                softwareLicenseSavingsPerEngineer: 20000 
+            };
+
+            function formatCurrency(value) {
+                if (value >= 1000000) {
+                    return `$${(value / 1000000).toFixed(2)}M`;
+                }
+                return `$${Math.round(value / 1000) * 1000}`;
+            }
+
+            function calculateSavings() {
+                const numEngineers = parseInt(engineerCountSlider.value);
+                const nptReductionPercent = parseInt(nptReductionSlider.value) / 100;
+                const timeSavingsPercent = parseInt(timeSavingsSlider.value) / 100;
+
+                const nptSavings = baseData.avgAnnualDowntimeCost * baseData.attributableNPTFactor * nptReductionPercent;
+                const timeTaxSavings = numEngineers * baseData.avgEngineerBurdenedSalary * baseData.timeWastedFactor * timeSavingsPercent;
+                const licenseSavings = numEngineers * baseData.softwareLicenseSavingsPerEngineer;
+
+                const totalSavings = nptSavings + timeTaxSavings + licenseSavings;
+                
+                engineerCountValue.textContent = numEngineers;
+                nptReductionValue.textContent = `${nptReductionSlider.value}%`;
+                timeSavingsValue.textContent = `${timeSavingsSlider.value}%`;
+                totalSavingsValue.textContent = formatCurrency(totalSavings);
+
+                updateChart(nptSavings, timeTaxSavings, licenseSavings);
+            }
+
+            function setupChart() {
+                savingsChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['NPT Reduction', 'Engineering Efficiency', 'Software Consolidation'],
+                        datasets: [{
+                            label: 'Annual Savings',
+                            data: [0, 0, 0],
+                            backgroundColor: [
+                                'rgba(13, 148, 136, 0.7)',
+                                'rgba(59, 130, 246, 0.7)',
+                                'rgba(249, 115, 22, 0.7)'
+                            ],
+                            borderColor: [
+                                'rgba(13, 148, 136, 1)',
+                                'rgba(59, 130, 246, 1)',
+                                'rgba(249, 115, 22, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return ` ${formatCurrency(context.raw)}`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return formatCurrency(value);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            function updateChart(npt, time, license) {
+                savingsChart.data.datasets[0].data = [npt, time, license];
+                savingsChart.update();
+            }
+
+            [engineerCountSlider, nptReductionSlider, timeSavingsSlider].forEach(slider => {
+                slider.addEventListener('input', calculateSavings);
+            });
+
+            setupChart();
+            calculateSavings();
+        });
+    </script>
+</body>
+</html>
